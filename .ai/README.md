@@ -175,33 +175,34 @@ La analice y redactamos un prompt para mejorar esto ya que me parecia muy escaso
 ---
 
 
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 04 — ... <Refinar mi prompt para claude code >
 
-**Modelo / herramienta:** Claude Code
+**Modelo / herramienta:** Gemini
 
 **Qué le pedí:** 
 
-
-
 ```
+Explicame mas simple ### 8. INTEGRACIÓN @indicium/channel-sync
+- ¿Cuál es su contrato? (asumir API callback)
+- ¿Cuándo triggerear? (después de crear/cancelar)
+- ¿Qué datos enviar?
 
 ```
 
 **Qué me respondió (resumen):**
-
+Una explicacion simple 
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+La acepte para tener contexto de que debo hacer 
 
 ---
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 05 — ... <Refinar mi prompt para claude code >   
 
 **Modelo / herramienta:** Claude Code
 
 **Qué le pedí:** 
 
-
-
 ```
+
 
 ```
 
