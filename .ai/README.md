@@ -299,13 +299,13 @@ Me genero un promopt con las rutas especificas para perfeccionar el prompt de cl
 **Qué hice con la respuesta:**
 La verifique en base a lo que conozco del proeycto y le pedi un plan de accion paso a paso para ejecutarlo despues con claude code y use las skills y mcp necesarios para que sea un entorno controlado en base a los requisitos que se propusieron 
 
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 11 — ... <Analisis de Ambiguedades Arquitectura  >
 
 **Modelo / herramienta:** Claude Code
 
 **Qué le pedí:** 
 
-
+Le pedi que ejecutara mi prompt perfecto analizando y antes de realizar cualquier cambio me de la estructura arquitectonica y  me informe de ambiguedades o contradicciones que encuentre para corregirlas antes de programarlo. Adjunte el .txt que tenia mi prompt "promptinperfecto.txt"
 
 ```
 
@@ -313,25 +313,30 @@ La verifique en base a lo que conozco del proeycto y le pedi un plan de accion p
 
 **Qué me respondió (resumen):**
 
+Me arrojo las ambiguedades que presentaba los errores que no corria aun en mi claude como los MCP que no servian , PATRONES DE RESOLUCION y el plan para comenzar con el cumplimiento de los requisitos.
+
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+La acepte y fui corrigiendo y docuemntando este ti po de ambiguedades 
 
 ### Prompt 09 — ... <Una guia para realizarlo con claude code >
 
-**Modelo / herramienta:** Claude Code
+**Modelo / herramienta:** Gemini
 
 **Qué le pedí:** 
 
 
-
 ```
+que es esto y como lo resuelvo 
+@indicium/channel-sync no existe como paquete público realAsumir contrato: channelSync.publish(event: 'reservation.confirmed'|'reservation.canceled', payload). Wrapper en ChannelSyncService con fallback a no-op en dev.
 
 ```
 
 **Qué me respondió (resumen):**
 
+Como poder responderlo la ambiguedad y el reto que representa para mis evaluadores.
+
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+La acepte y la perfeccione para mi siguiente prompt y basrame en esa respuesta para manejarla de una manera solida los errores y hallazgos encontrado dado por sentado que existe la libreria publishcc
 
 ### Prompt 10 — ... <Una guia para realizarlo con claude code >
 
