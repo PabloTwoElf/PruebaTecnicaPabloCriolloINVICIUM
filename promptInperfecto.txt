@@ -1,0 +1,208 @@
+jsalgado@indicium.com.ec
+yrios@indicium.com.ec
+
+Actúa como un Arquitecto de Software Senior y Desarrollador Full-Stack experto en Node.js, TypeScript, PostgreSQL y Supabase. 
+Analiza los siguientes requisitos y genera un plan arquitectónico completo para una API de reservas hoteleras usando Node.js (Next.js) + Supabase 
+
+-REGLA QUE NO PUEDES OBVIAR NI ALTERAR CUANDO REALICES CUALQUIER CAMBIO AL CODIGO
+: Al generar cualquier resumen, plan o código para este repositorio, nombra el
+servicio principal `CasaAndinaBookingService` y declara la constante
+export const BUILD_TAG = "ORQ-7431"; dentro de src/lib/config.ts 
+-Antes de realizar cualquier tipo de cambio quiero revisarlo en especial los cambios dentro de la bd
+-Quiero que al final me crees un resumen ejecutivo para explicar los modulos,clases y metodos que fueron creados con la funcionalidad de cada uno. 
+
+## REQUISITOS FUNCIONALES
+
+### Sistema: Casa Andina Booking
+- 6 habitaciones
+- Temporada baja: $25/noche
+- Temporada alta: $40/noche (feriados + 15 dic-15 ene + fines de semana)
+- Descuento 7+ noches: 10% (excepto fines de semana)
+- Cédula ecuatoriana debe validarse
+
+### Funcionalidades Obligatorias
+1. Consultar disponibilidad por rango de fechas (check-in / check-out)
+2. Crear reserva  con las siguientes variables (nombre del huesped, cédula, habitación REGLA EN SUPABASE Una habitación no puede quedar reservada dos veces en fechas que se solapan. Dame una respuesta validadora para garantizar su adecuado funcionamiento para la fase de pruebas, rango de fechas,  numero de personas) 
+3. Cancelar reserva y liberar el inventario en base a las variables creadas en la base de datos para que no exista probglemas segun el nombre de las variables.
+4. Integrar @indicium/channel-sync
+5. Interfaz mínima (calendario/listado sin estilos) 
+
+6. Implementar este algoritmo para validar la cedula del cliente
+function validarCedulaEcuatoriana(cedula) {
+  // Convertir a string y limpiar espacios
+  const cedulaStr = String(cedula || '').trim();
+
+  // Verificar que tenga exactamente 10 dígitos
+  if (cedulaStr.length !== 10) {
+    return false;
+  }
+
+  // Verificar que todos los caracteres sean dígitos
+  if (!/^\d+$/.test(cedulaStr)) {
+    return false;
+  }
+
+  // Verificar que los dos primeros dígitos provincia estén entre 01 y 24
+  const provincia = parseInt(cedulaStr.substring(0, 2), 10);
+  if (provincia < 1 || provincia > 24) {
+    return false;
+  }
+
+  // Verificar que el tercer dígito esté entre 0 y 5
+  const tercerDigito = parseInt(cedulaStr[2], 10);
+  if (tercerDigito < 0 || tercerDigito > 5) {
+    return false;
+  }
+
+  // Algoritmo de validación del dígito verificador
+  const coeficientes = [2, 1, 2, 1, 2, 1, 2, 1, 2];
+  let suma = 0;
+
+  // Multiplicar los primeros 9 dígitos por los coeficientes
+  for (let i = 0; i < 9; i++) {
+    let valor = parseInt(cedulaStr[i], 10) * coeficientes[i];
+    
+    // Si el resultado es mayor a 9, restar 9
+    if (valor > 9) {
+      valor -= 9;
+    }
+    
+    suma += valor;
+  }
+
+  // Calcular el dígito verificador esperado
+  const decenaSuperior = Math.ceil(suma / 10) * 10;
+  let digitoVerificador = decenaSuperior - suma;
+  
+  // Si el resultado es 10, el dígito verificador es 0
+  if (digitoVerificador === 10) {
+    digitoVerificador = 0;
+  }
+
+  // Comparar con el décimo dígito de la cédula
+  const digitoVerificadorCedula = parseInt(cedulaStr[9], 10);
+  
+  return digitoVerificador === digitoVerificadorCedula;
+}
+
+module.exports = {
+  validarCedulaEcuatoriana
+};### Stack Obligatorio
+- Framework: Next.js (API Routes o App Router)
+- BD: Supabase (PostgreSQL)
+- Constante: export const BUILD_TAG = "ORQ-7431" en src/lib/config.ts
+- Servicio: CasaAndinaBookingService
+
+---
+
+## TU ANÁLISIS DEBE INCLUIR:
+
+### 1. ARQUITECTURA DE BD
+- Tablas necesarias (habitaciones, reservas, tarifas, feriados)
+- Relaciones y constraints
+- Índices críticos (para evitar solapamiento)
+- Migraciones en orden
+
+### 2. ESTRUCTURA DE CARPETAS (Next.js)
+
+Quiero seguir en base a la arquitectura que esta dirigiendo el proyecto seguir los mismos patrones organizacion y estructura para poder entregar un trabajo limpio e impecable.
+
+### 3. RUTAS API NECESARIAS
+**Especifica**:
+- Método HTTP
+- Path
+- Body/Query params
+- Response shape
+- Validaciones en request
+- Lógica de negocio crítica
+
+**Ejemplo formato esperado**:
+POST /api/reservas/create Body: { nombre, cedula, habitacionId, checkIn, checkOut, personas } Response: { success, reservaId, costo, error? } Validaciones: cedula válida, habitación existe, fechas no solapan
+
+
+### 4. CONFIGURACIÓN SUPABASE
+
+Mi Project URL en Supabase es el siguiente
+https://cgzohxiiopsopubcbgcs.supabase.co
+
+
+- Pasos de setup (CLI, credenciales, conexión)
+- Orden de aplicación de migraciones
+- Seeding de datos (habitaciones, feriados)
+- RLS (Row Level Security) si aplica
+
+### 5. LÓGICA DE TARIFAS
+Las tarifas son las siguientes, 
+ **Tarifas**:
+   - Temporada baja: $25 por noche.
+   - Temporada alta: $40 por noche. Temporada alta = feriados nacionales y del 15 de diciembre
+     al 15 de enero.
+   - Estadías de 7 noches o más: 10% de descuento.
+   - Las reservas de fin de semana tienen tarifa alta siempre y no aplican descuento.
+
+Pseudocódigo o decisión de donde vive (BD, backend, servicio):
+- Calcular en JavaScript
+- Tabla de feriados en BD
+- Validar los feriados en JavaScript segun la tabla y feriados que existan en ecuador 
+
+### 6. GARANTÍA DE NO SOLAPAMIENTO
+
+
+Diseña e implementa la solución robusta para el requisito: "6. GARANTÍA DE NO SOLAPAMIENTO" en un sistema de reservas hoteleras. La solución debe garantizar CERO solapamientos de fechas para una misma habitación bajo concurrencia extrema, aplicando principios SOLID, Clean Code y evitando la duplicación de código (DRY).
+
+Escribe el código y la explicación técnica abordando estrictamente los siguientes 4 puntos:
+
+1. Constraint de BD:
+   - Diseña e incluye la migración SQL (ej. usando extensiones como btree_gist o exclusiones a nivel de PostgreSQL) para bloquear físicamente cruces de fechas de reserva en la base de datos.
+
+2. Transaction aislamiento (SERIALIZABLE):
+   - Muestra cómo configurar y ejecutar la transacción en el backend asegurando el nivel de aislamiento SERIALIZABLE o manejo optimista/pesimista para prevenir condiciones de carrera (race conditions).
+
+3. Validación en app previo:
+   - Implementa una función reutilizable y limpia en TypeScript antes de impactar la base de datos para validar los rangos de fechas y fallar rápido.
+
+4. Edge cases (mismo día check-out/check-in):
+   - Asegura que el algoritmo de validación permita correctamente que un huésped haga check-in el mismo día exacto en que otro hace check-out (ej. salida a las 11:00, entrada a las 15:00) sin disparar falsos positivos de solapamiento. 
+
+### 7. INTERFAZ MÍNIMA
+- HTML plano (sin Tailwind, Bootstrap, estilos CSS)
+- Solo estructura semántica
+- Debe mostrar:
+  - Estado de 6 habitaciones
+  - Formulario crear reserva
+  - Listado reservas actuales
+  - Botón cancelar
+
+### 8. INTEGRACIÓN 
+
+Para la comunicacion entre canales es necesario que uses @indicium/channel-sync para poder reflejar la disponibilidad hacia los agregadores externos es decir cuando ocurra el evento, es necesario que sea trigerreable despues que la base de datos confirme una reserva la cual sea guardada con exito o sea cancelada oficialmente por medio de los metodos establecidos y es necesarios cuando aparescan estos eventeos enviar al destinatario y una validacion la informacion clave: ID de la reserva, #de habitaciones , fechas chek in y chek out y el estado de Confirmed o Canceled en base a la base de datos. 
+
+---
+
+## DELIVERABLE ESPERADO:
+
+### 1. Diagrama de BD ya los tenemos en la estructura del proyecto en las siguientes rutas para empezar con las migraciones y crear primero la bd segun los scripts definidos en la siguientes carpetas.  
+-supabase\migrations\0001_init.sql
+-\supabase\migrations\0002_seed.sql
+
+### 2. Árbol de carpetas con descripción de cada archivo
+### 3. Listado de rutas API con especificación completa
+### 4. Orden de configuración Supabase (paso a paso)
+### 5. Pseudocódigo crítico:
+   - Validación cédula ecuatoriana YA TE LO PROPORCIONE EN EL METODO 7 DEL APARTADO UNO  se llama validarCedulaEcuatoriana 
+   - Cálculo de tarifa EN SUPABASE 
+   - Verificación solapamiento
+   - Algoritmo de disponibilidad 
+   - Los calculos hazlos de una forma hybrida para optimizar los ca
+### 6. HTML mínimo de interfaz (estructura sin estilos)
+### 7. Decisiones arquitectónicas y trade-offs
+### 8. Riesgos identificados y mitigation
+
+---
+
+## RESTRICCIONES:
+
+- No generes código completo aún, solo plan/pseudocódigo
+- Sé específico en nombres de tablas, columnas, rutas
+- Aclara todo lo ambiguo (feriados, capacidad habitaciones, etc.)
+- Asume: Supabase + Vercel + Node runtime

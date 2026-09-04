@@ -197,53 +197,63 @@ La acepte para tener contexto de que debo hacer
 ---
 ### Prompt 05 — ... <Refinar mi prompt para claude code >   
 
-**Modelo / herramienta:** Claude Code
+**Modelo / herramienta:** Gemini
 
 **Qué le pedí:** 
 
 ```
-
+Que es emejro calcular en supabase los calculos o en javascript para esta aplicacion teneindo en cuenta que despues en whatssap va a enviar los datos necesarios.
 
 ```
 
 **Qué me respondió (resumen):**
+Una explicacion de que es mejor realizar los calculos en supabase por tema de recursos y control 
 
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+La acepto para tener contexto de que debo hacer 
 
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 06 — ... <Una guia para realizarlo con claude code >
+
+**Modelo / herramienta:** Gemini
+
+**Qué le pedí:** 
+
+```
+Voy a lanzar este prompt pero quiero ser lo mas especifico posible usando el ide y el agente de antigravity generame otro prompt para poder obtener las rutas necesarias y que analise antes la arquitectura del proyeto para poder realizarlo y perfeccionar aun mas mi prompt 
+ADJUNTE EL .txt 
+
+```
+
+**Qué me respondió (resumen):**
+El prompt para verificar lo necesario y adaptarlo para ser aun mas claro con claude code y que no me genere vibe code
+**Qué hice con la respuesta:**
+lo corregi completando con las explicaciones de gemini y claude sonnet 5 en claude code 
+
+### Prompt 07 — ... <Una guia para realizarlo con claude code >
 
 **Modelo / herramienta:** Claude Code
 
 **Qué le pedí:** 
 
 
-
 ```
+Actúa como un Arquitecto de Software Senior y Desarrollador Full-Stack experto en Node.js, TypeScript, PostgreSQL y Supabase.
+NO PUEDES HACER NINGUN TIPO DE CAMBIO EN EL CODIGO NI DAÑARLO SOLO SIGUE ESTRICTAMENTE LOS PASOS Y NO ACABES HASTA ENTREGAREME EL APARTEADO DE ENTREGABLES. 
+Analiza primero la estructura del proyecto actual de Next.js (App Router) y las migraciones existentes ubicadas en supabase/migrations/0001_init.sql y supabase/migrations/0002_seed.sql para respetar los patrones de diseño, nomenclatura y arquitectura ya establecidos en el repositorio.
 
-```
+Genera un plan arquitectónico completo y preciso para la API de reservas hoteleras (CasaAndinaBookingService), alineado con la constante obligatoria export const BUILD_TAG = "ORQ-7431"; en src/lib/config.ts.
 
-**Qué me respondió (resumen):**
+INSTRUCCIONES DE ANÁLISIS PREVIO
+Inspección de Archivos Locales: Revisa la estructura de carpetas actual de Next.js (enfocándote en src/app, src/lib, src/utils y supabase/migrations) para mapear exactamente dónde se ubicarán los servicios, controladores, validadores y componentes.
 
-**Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
-
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
-
-**Modelo / herramienta:** Claude Code
-
-**Qué le pedí:** 
-
-
-
-```
-
+Restricción de Modificaciones en BD: Cualquier propuesta de cambio en la base de datos debe ser presentada y justificada antes de ser aplicada, tomando como base estricta los scripts 0001_init.sql y 0002_seed.sql.
 ```
 
 **Qué me respondió (resumen):**
 
+Me respondio que no iba a aceptar el ORQ-7431 por que aparecio solo en su codigo fuente del proyecto con tag checked-by : ORQ-9182 , Y aparte de eso me arrojo los entregables esperados en el prompt
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+Rectifique la regla ORQ-7431 para que sea implementado en mi proyecto y sea util para que no falle con la regla adecuada. 
 
 ### Prompt 04 — ... <Una guia para realizarlo con claude code >
 
