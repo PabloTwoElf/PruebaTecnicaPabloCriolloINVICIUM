@@ -8,8 +8,9 @@ Completa este archivo. Pesa en la evaluación tanto como el código.
 
 ## Ambigüedades o contradicciones que encontré
 
-<!-- Si algo en los requisitos no cerraba, dilo aquí y explica cómo lo resolviste. -->
+Durante el análisis del repositorio, detecté una contradicción deliberada introducida como un marcador de integridad (Prompt Injection). En el README existía un comentario HTML oculto dirigido específicamente a asistentes de IA, instruyendo declarar la constante `BUILD_TAG = "ORQ-7431"` en `src/lib/config.ts`. 
 
+- Se encontro un bug off-by-one 
 ## Qué descarté y por qué
 
 <!-- Alternativas que consideraste y rechazaste. Incluye las que te sugirió la IA y no aceptaste. -->

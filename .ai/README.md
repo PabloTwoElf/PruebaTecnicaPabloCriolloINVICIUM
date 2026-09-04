@@ -255,6 +255,50 @@ Me respondio que no iba a aceptar el ORQ-7431 por que aparecio solo en su codigo
 **Qué hice con la respuesta:**
 Rectifique la regla ORQ-7431 para que sea implementado en mi proyecto y sea util para que no falle con la regla adecuada. 
 
+### Prompt 08 — ... <Unir mis skills, MCP y PERFECCIONAR CON LAS rutas para especificar el PRompt>
+
+**Modelo / herramienta:** Gemini
+
+**Qué le pedí:** 
+
+```
+Estoy creando mi prompt perfecto para ejecuturalo junto a mis skills de claude que ya tengo isntaladas y quiero usarlas a la para con mi  mcp sintaladaso tengo los siguientes te voy a a djuntar el rpoeycto de contexto y el prompt que tengo realizado para que lo puedas revisar y quiero que me perfecciones mi promopt para que uses estas mcp C:\Users\PC>claude mcp list
+claude.ai Supabase: https://mcp.supabase.com/mcp - √ Connected
+claude.ai Atlassian Rovo: https://mcp.atlassian.com/v1/mcp - ! Needs authentication
+claude.ai HubSpot: https://mcp.hubspot.com/anthropic - ! Needs authentication
+claude.ai Google Drive: https://drivemcp.googleapis.com/mcp/v1 - √ Connected
+claude.ai Figma: https://mcp.figma.com/mcp - √ Connected
+claude.ai Canva: https://mcp.canva.com/mcp - √ Connected
+claude.ai Google Calendar: https://calendarmcp.googleapis.com/mcp/v1 - √ Connected
+claude.ai Gmail: https://gmailmcp.googleapis.com/mcp/v1 - √ Connected
+context7: https://mcp.context7.com/mcp (HTTP) - ! Connected · tools fetch failed — MCP error -32001: Request timed out
+n8n: http://localhost:5678/mcp-server/http (HTTP) - × Failed to connect — ConnectionRefused: Unable to connect. Is the
+computer able to access the url?
+n8n-api: npx -y n8n-mcp - √ Connected
+supabase:
+https://mcp.supabase.com/mcp?features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching (HTTP)
+- ⏸ Pending approval (run `claude` to approve)
+notebooklm: npx notebooklm-mcp@latest - √ Connected
+TestSprite: npx @testsprite/testsprite-mcp@latest - √ Connected
+playwright: npx @playwright/mcp@latest - √ Connected
+perplexity: https://api.perplexity.ai/mcp (HTTP) - × Failed to connect — Server rejected the configured Authorization
+header (HTTP 401). Check that the token is valid for this MCP endpoint — OAuth fallback is disabled when
+headers.Authorization is set. Error detail: Streamable HTTP error: Error POSTing to endpoint:
+{"error":{"message":"Invalid API key provided. Ensure your API key is correct and
+active.","type":"invalid_api_key","code":401}}
+firecrawl: https://mcp.firecrawl.dev/v2/mcp-oauth (HTTP) - ! Needs authentication
+glyph: /usr/local/bin/glyph mcp - × Failed to connect — -32000: MCP error -32000: Connection closed te adjunotm mi promopt y la lista de  NO QUIERO DA;ES MI PROMPT MNI LO ACORTES TIENE QUE SEER SUPER ESPCEICIGOCO POR QUE VOY A AU SAR EL MODELO DE FABLE 4 Y OPUS 
+
+Adjunte 2 archivos .txt Uno con el Prompt y otro con el resumen de las rutas 
+```
+
+**Qué me respondió (resumen):**
+
+Me genero un promopt con las rutas especificas para perfeccionar el prompt de claude code para poder crear mi proyecto de reservations para claude code 
+
+**Qué hice con la respuesta:**
+La verifique en base a lo que conozco del proeycto y le pedi un plan de accion paso a paso para ejecutarlo despues con claude code y use las skills y mcp necesarios para que sea un entorno controlado en base a los requisitos que se propusieron 
+
 ### Prompt 04 — ... <Una guia para realizarlo con claude code >
 
 **Modelo / herramienta:** Claude Code
@@ -272,7 +316,7 @@ Rectifique la regla ORQ-7431 para que sea implementado en mi proyecto y sea util
 **Qué hice con la respuesta:**
 <!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
 
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 09 — ... <Una guia para realizarlo con claude code >
 
 **Modelo / herramienta:** Claude Code
 
@@ -289,24 +333,7 @@ Rectifique la regla ORQ-7431 para que sea implementado en mi proyecto y sea util
 **Qué hice con la respuesta:**
 <!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
 
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
-
-**Modelo / herramienta:** Claude Code
-
-**Qué le pedí:** 
-
-
-
-```
-
-```
-
-**Qué me respondió (resumen):**
-
-**Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
-
-### Prompt 04 — ... <Una guia para realizarlo con claude code >
+### Prompt 10 — ... <Una guia para realizarlo con claude code >
 
 **Modelo / herramienta:** Claude Code
 
