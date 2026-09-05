@@ -1,6 +1,8 @@
 import { disponibilidadService } from "@/lib/services/DisponibilidadService";
 import { supabase } from "@/lib/db";
-import { DisponibilidadPorHabitacion, Habitacion, Reserva } from "@/lib/types";
+import { Feriado, Habitacion, Reserva } from "@/lib/types";
+import { BookingApp } from "@/components/BookingApp";
+import { ReservasPanel } from "@/components/ReservasPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,14 @@ async function cargarHabitaciones(): Promise<Habitacion[]> {
   return (data ?? []) as Habitacion[];
 }
 
+async function cargarFeriados(): Promise<Feriado[]> {
+  const { data } = await supabase
+    .from("feriados")
+    .select("id, fecha, nombre, tipo")
+    .order("fecha");
+  return (data ?? []) as Feriado[];
+}
+
 async function cargarReservas(): Promise<ReservaConJoin[]> {
   const { data } = await supabase
     .from("reservas")
@@ -38,7 +48,7 @@ async function cargarReservas(): Promise<ReservaConJoin[]> {
   return (data ?? []) as unknown as ReservaConJoin[];
 }
 
-async function cargarDisponibilidad(): Promise<DisponibilidadPorHabitacion[]> {
+async function cargarDisponibilidadHoy() {
   try {
     return await disponibilidadService.verificarDisponibilidadOrq(
       hoyIso(),
@@ -50,167 +60,30 @@ async function cargarDisponibilidad(): Promise<DisponibilidadPorHabitacion[]> {
 }
 
 export default async function Home() {
-  const [habitaciones, reservas, disponibilidadHoy] = await Promise.all([
+  const [habitaciones, feriados, reservas, dispHoy] = await Promise.all([
     cargarHabitaciones(),
+    cargarFeriados(),
     cargarReservas(),
-    cargarDisponibilidad(),
+    cargarDisponibilidadHoy(),
   ]);
 
-  const librasHoy = disponibilidadHoy.filter((d) => d.libre).length;
+  const librasHoy = dispHoy.filter((d) => d.libre).length;
 
   return (
     <>
       <header>
         <h1>🏨 Hostal Casa Andina · Reservas Directas</h1>
         <div className="meta">
-          {librasHoy}/{habitaciones.length} libres hoy · {reservas.length} reservas activas
+          {librasHoy}/{habitaciones.length} libres hoy · {feriados.length} feriados 2026
         </div>
       </header>
 
       <div className="grid">
-        {/* Panel 1: Habitaciones */}
-        <div className="panel">
-          <h2>Habitaciones (hoy)</h2>
-          <div className="panel-scroll">
-            <div className="rooms">
-              {habitaciones.map((h) => {
-                const est = disponibilidadHoy.find((d) => d.habitacion.id === h.id);
-                let badge: { clase: string; texto: string };
-                if (!h.activa) badge = { clase: "badge-muted", texto: "inactiva" };
-                else if (est?.libre) badge = { clase: "badge-ok", texto: "libre" };
-                else badge = { clase: "badge-warn", texto: "ocupada" };
-
-                return (
-                  <div className="room" key={h.id}>
-                    <div className="room-main">
-                      <span className="room-code">
-                        #{h.codigo} · {h.nombre}
-                      </span>
-                      <span className="room-name">Capacidad {h.capacidad}p</span>
-                    </div>
-                    <span className={`badge ${badge.clase}`}>{badge.texto}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Panel 2: Formularios */}
-        <div className="panel">
-          <h2>Acciones</h2>
-          <div className="forms">
-            <div className="form-block">
-              <h3>Consultar disponibilidad</h3>
-              <form method="GET" action="/api/disponibilidad">
-                <div className="form-grid-2">
-                  <div className="form-row">
-                    <label>Check-in</label>
-                    <input type="date" name="checkIn" defaultValue={hoyIso()} required />
-                  </div>
-                  <div className="form-row">
-                    <label>Check-out</label>
-                    <input type="date" name="checkOut" defaultValue={isoMas(1)} required />
-                  </div>
-                </div>
-                <button type="submit">Consultar</button>
-              </form>
-            </div>
-
-            <div className="form-block">
-              <h3>Nueva reserva</h3>
-              <form method="POST" action="/api/reservas">
-                <div className="form-row">
-                  <label>Nombre del huésped</label>
-                  <input name="nombre" required minLength={2} placeholder="Ej. Juan Pérez" />
-                </div>
-                <div className="form-grid-2">
-                  <div className="form-row">
-                    <label>Cédula</label>
-                    <input name="cedula" pattern="\d{10}" required placeholder="1712345678" />
-                  </div>
-                  <div className="form-row">
-                    <label>Personas</label>
-                    <input type="number" name="personas" min={1} defaultValue={1} required />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <label>Habitación</label>
-                  <select name="habitacionId" required>
-                    {habitaciones
-                      .filter((h) => h.activa)
-                      .map((h) => (
-                        <option key={h.id} value={h.id}>
-                          #{h.codigo} — {h.nombre} (cap {h.capacidad})
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div className="form-grid-2">
-                  <div className="form-row">
-                    <label>Check-in</label>
-                    <input type="date" name="checkIn" defaultValue={hoyIso()} required />
-                  </div>
-                  <div className="form-row">
-                    <label>Check-out</label>
-                    <input type="date" name="checkOut" defaultValue={isoMas(1)} required />
-                  </div>
-                </div>
-                <button type="submit">Reservar</button>
-                <p className="hint">
-                  Este form envía urlencoded. Para JSON usar <code>POST /api/reservas</code>.
-                </p>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        {/* Panel 3: Reservas activas */}
-        <div className="panel">
-          <h2>Reservas confirmadas</h2>
-          <div className="panel-scroll">
-            {reservas.length === 0 ? (
-              <p className="empty">No hay reservas confirmadas.</p>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Hab.</th>
-                    <th>Huésped</th>
-                    <th>Cédula</th>
-                    <th>Entrada</th>
-                    <th>Salida</th>
-                    <th>Pax</th>
-                    <th>Total</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reservas.map((r) => (
-                    <tr key={r.id}>
-                      <td>{r.id}</td>
-                      <td>{r.habitaciones?.codigo ?? r.habitacion_id}</td>
-                      <td>{r.huespedes?.nombre ?? "—"}</td>
-                      <td>{r.huespedes?.cedula ?? "—"}</td>
-                      <td>{r.check_in}</td>
-                      <td>{r.check_out}</td>
-                      <td>{r.personas}</td>
-                      <td>${r.precio_total ?? "—"}</td>
-                      <td>
-                        <form method="POST" action={`/api/reservas/${r.id}/cancelar`}>
-                          <button type="submit" className="danger">
-                            Cancelar
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+        <BookingApp
+          habitaciones={habitaciones}
+          feriados={feriados.map((f) => ({ fecha: f.fecha, nombre: f.nombre }))}
+        />
+        <ReservasPanel initialReservas={reservas} />
       </div>
     </>
   );

@@ -6,7 +6,6 @@ interface ChannelSyncClient {
 
 async function cargarCliente(): Promise<ChannelSyncClient | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mod: unknown = await import("@indicium/channel-sync" as string);
     const candidate = mod as { publish?: ChannelSyncClient["publish"] };
     if (typeof candidate.publish === "function") {
@@ -18,15 +17,17 @@ async function cargarCliente(): Promise<ChannelSyncClient | null> {
   }
 }
 
-const clientePromise = cargarCliente();
+const clienteSingleton: Promise<ChannelSyncClient | null> = cargarCliente();
 
 export class ChannelSyncService {
-  constructor(
-    private readonly clientePromise: Promise<ChannelSyncClient | null> = clientePromise
-  ) {}
+  private readonly cliente: Promise<ChannelSyncClient | null>;
+
+  constructor(cliente: Promise<ChannelSyncClient | null> = clienteSingleton) {
+    this.cliente = cliente;
+  }
 
   async notificar(evento: EventoChannelSync, payload: ChannelSyncPayload): Promise<void> {
-    const cliente = await this.clientePromise;
+    const cliente = await this.cliente;
 
     if (!cliente) {
       if (process.env.NODE_ENV !== "production") {
