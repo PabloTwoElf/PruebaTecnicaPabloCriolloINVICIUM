@@ -1,4 +1,16 @@
-import { TARIFAS, TEMPORADA_ALTA_FIJA } from "@/lib/config";
+import { TARIFAS } from "@/lib/config";
+import {
+  esFinDeSemana,
+  estaEnTemporadaAltaFija,
+  iterarNoches,
+  toIso,
+} from "@/utils/fechas";
+
+// Reexportadas: este módulo es el punto de entrada "client-safe" para
+// componentes "use client" (PriceCalendar, BookingApp). La lógica de fecha
+// vive una sola vez en utils/fechas.ts (no depende de Supabase, así que es
+// segura de importar tanto en server como en cliente).
+export { esFinDeSemana, estaEnTemporadaAltaFija };
 
 export type TipoNoche = "alta" | "baja";
 
@@ -9,29 +21,6 @@ export interface DiaCotizado {
   esFinDeSemana: boolean;
   esFeriado: boolean;
   nombreFeriado?: string;
-}
-
-function parseUTC(fecha: string): Date {
-  return new Date(`${fecha}T00:00:00Z`);
-}
-
-function toIso(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
-
-export function esFinDeSemana(fecha: string): boolean {
-  const dow = parseUTC(fecha).getUTCDay();
-  return dow === 0 || dow === 6;
-}
-
-export function estaEnTemporadaAltaFija(fecha: string): boolean {
-  const d = parseUTC(fecha);
-  const mes = d.getUTCMonth() + 1;
-  const dia = d.getUTCDate();
-  const { inicioMes, inicioDia, finMes, finDia } = TEMPORADA_ALTA_FIJA;
-  if (mes === inicioMes && dia >= inicioDia) return true;
-  if (mes === finMes && dia <= finDia) return true;
-  return false;
 }
 
 export function cotizarDia(
@@ -62,13 +51,4 @@ export function generarMes(anio: number, mes: number): string[] {
   return fechas;
 }
 
-export function iterarRangoNoches(checkIn: string, checkOut: string): string[] {
-  const noches: string[] = [];
-  const cur = parseUTC(checkIn);
-  const fin = parseUTC(checkOut);
-  while (cur < fin) {
-    noches.push(toIso(cur));
-    cur.setUTCDate(cur.getUTCDate() + 1);
-  }
-  return noches;
-}
+export const iterarRangoNoches = iterarNoches;
