@@ -492,6 +492,86 @@ input.ced-parcial {
 .ced-hint.ced-parcial { color: var(--muted); }
 .ced-hint.ced-vacia { color: var(--muted); font-style: italic; }
 
+/* Tabs de filtro */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+
+.tab:hover:not(.active) {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.tab.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.tab-count {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tab.active .tab-count { background: rgba(255, 255, 255, 0.25); }
+
+/* Badges de estado */
+.badge-confirmada {
+  background: rgba(46, 160, 67, 0.15);
+  color: var(--ok);
+  border: 1px solid rgba(46, 160, 67, 0.4);
+}
+
+.badge-cancelada {
+  background: rgba(248, 81, 73, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+}
+
+tbody tr.row-cancelada {
+  opacity: 0.55;
+}
+
+tbody tr.row-cancelada td {
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+}
+
+tbody tr.row-cancelada .badge {
+  text-decoration: none;
+}
+
+.cell-muted {
+  color: var(--muted);
+  font-size: 10px;
+}
+
 /* Realtime indicator */
 .live-dot {
   display: inline-block;

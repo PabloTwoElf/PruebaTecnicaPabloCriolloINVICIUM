@@ -1,0 +1,331 @@
+openapi: 3.0.3
+info:
+  title: Casa Andina Booking API
+  description: |
+    Motor de reservas directas del Hostal Casa Andina.
+    6 habitaciones · tarifas alta/baja · validación cédula ecuatoriana · anti-solape con `EXCLUDE USING gist`.
+  version: "1.0.0"
+  contact:
+    name: Pablo Criollo — Indicium S.A.
+servers:
+  - url: http://localhost:3000
+    description: Desarrollo local
+
+tags:
+  - name: Habitaciones
+  - name: Disponibilidad
+  - name: Reservas
+  - name: Feriados
+
+paths:
+  /api/habitaciones:
+    get:
+      tags: [Habitaciones]
+      summary: Lista las 6 habitaciones del hostal
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  habitaciones:
+                    type: array
+                    items: { $ref: '#/components/schemas/Habitacion' }
+
+  /api/feriados:
+    get:
+      tags: [Feriados]
+      summary: Lista feriados nacionales/locales cargados
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  feriados:
+                    type: array
+                    items: { $ref: '#/components/schemas/Feriado' }
+
+  /api/disponibilidad:
+    get:
+      tags: [Disponibilidad]
+      summary: Consulta disponibilidad + tarifa estimada
+      parameters:
+        - name: checkIn
+          in: query
+          required: true
+          schema: { type: string, format: date, example: "2026-10-15" }
+        - name: checkOut
+          in: query
+          required: true
+          schema: { type: string, format: date, example: "2026-10-17" }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkIn: { type: string, format: date }
+                  checkOut: { type: string, format: date }
+                  noches: { type: integer }
+                  estado:
+                    type: array
+                    items: { $ref: '#/components/schemas/EstadoDisponibilidad' }
+                  tarifaEstimada:
+                    oneOf:
+                      - $ref: '#/components/schemas/DetalleTarifa'
+                      - type: 'null'
+        '400':
+          description: Rango inválido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /api/reservas:
+    get:
+      tags: [Reservas]
+      summary: Lista reservas con join a habitación y huésped
+      parameters:
+        - name: estado
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [confirmada, cancelada, all]
+            default: confirmada
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservas:
+                    type: array
+                    items: { $ref: '#/components/schemas/ReservaConJoin' }
+    post:
+      tags: [Reservas]
+      summary: Crea una reserva
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CrearReservaInput' }
+            examples:
+              baja:
+                summary: Temporada baja (mar-jue)
+                value:
+                  nombre: "Ana Torres"
+                  cedula: "1710034065"
+                  habitacionId: 2
+                  checkIn: "2026-11-03"
+                  checkOut: "2026-11-05"
+                  personas: 2
+              navidad:
+                summary: Temporada alta (Navidad)
+                value:
+                  nombre: "Navidad Guest"
+                  cedula: "1802345676"
+                  habitacionId: 5
+                  checkIn: "2026-12-24"
+                  checkOut: "2026-12-26"
+                  personas: 2
+      responses:
+        '201':
+          description: Reserva creada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReservaCreada' }
+        '400':
+          description: Validación fallida
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              examples:
+                cedulaInvalida:
+                  value: { success: false, error: "CEDULA_INVALIDA" }
+                capacidadExcedida:
+                  value: { success: false, error: "CAPACIDAD_EXCEDIDA" }
+        '409':
+          description: Solapamiento con otra reserva confirmada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example: { success: false, error: "RESERVA_SOLAPADA" }
+
+  /api/reservas/{id}/cancelar:
+    post:
+      tags: [Reservas]
+      summary: Cancela una reserva (soft delete a `estado='cancelada'`)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: Cancelada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  reservaId: { type: integer }
+                  estado: { type: string, example: "cancelada" }
+        '400':
+          description: ID inválido
+        '404':
+          description: Reserva no encontrada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example: { success: false, error: "NO_ENCONTRADA" }
+        '409':
+          description: Reserva ya cancelada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example: { success: false, error: "YA_CANCELADA" }
+
+components:
+  schemas:
+    Habitacion:
+      type: object
+      properties:
+        id: { type: integer }
+        codigo: { type: string, example: "101" }
+        nombre: { type: string, example: "Doble Ventana" }
+        capacidad: { type: integer, example: 2 }
+        activa: { type: boolean }
+
+    Feriado:
+      type: object
+      properties:
+        id: { type: integer }
+        fecha: { type: string, format: date }
+        nombre: { type: string, example: "Navidad" }
+        tipo:
+          type: string
+          enum: [nacional, local]
+
+    EstadoDisponibilidad:
+      type: object
+      properties:
+        habitacion: { $ref: '#/components/schemas/Habitacion' }
+        libre: { type: boolean }
+        reservasConflicto:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              check_in: { type: string, format: date }
+              check_out: { type: string, format: date }
+
+    DesgloseNoche:
+      type: object
+      properties:
+        fecha: { type: string, format: date }
+        tipo:
+          type: string
+          enum: [alta, baja]
+        monto: { type: number }
+        esFinDeSemana: { type: boolean }
+        esFeriado: { type: boolean }
+
+    DetalleTarifa:
+      type: object
+      properties:
+        noches: { type: integer }
+        base: { type: number }
+        descuento: { type: number }
+        total: { type: number }
+        aplicaDescuento: { type: boolean }
+        desglose:
+          type: array
+          items: { $ref: '#/components/schemas/DesgloseNoche' }
+
+    CrearReservaInput:
+      type: object
+      required: [nombre, cedula, habitacionId, checkIn, checkOut, personas]
+      properties:
+        nombre: { type: string, minLength: 2, example: "Ana Torres" }
+        cedula:
+          type: string
+          pattern: '^\d{10}$'
+          description: "Cédula ecuatoriana (10 dígitos, algoritmo módulo 10)"
+          example: "1710034065"
+        habitacionId: { type: integer, example: 2 }
+        checkIn: { type: string, format: date, example: "2026-11-03" }
+        checkOut: { type: string, format: date, example: "2026-11-05" }
+        personas: { type: integer, minimum: 1, example: 2 }
+
+    ReservaCreada:
+      type: object
+      properties:
+        success: { type: boolean }
+        reservaId: { type: integer }
+        costo: { type: number }
+        desglose:
+          type: array
+          items: { $ref: '#/components/schemas/DesgloseNoche' }
+
+    ReservaConJoin:
+      type: object
+      properties:
+        id: { type: integer }
+        habitacion_id: { type: integer }
+        huesped_id: { type: integer }
+        check_in: { type: string, format: date }
+        check_out: { type: string, format: date }
+        personas: { type: integer }
+        precio_total: { type: number, nullable: true }
+        estado:
+          type: string
+          enum: [confirmada, cancelada]
+        creado_en: { type: string, format: date-time }
+        habitaciones:
+          type: object
+          nullable: true
+          properties:
+            codigo: { type: string }
+            nombre: { type: string }
+        huespedes:
+          type: object
+          nullable: true
+          properties:
+            nombre: { type: string }
+            cedula: { type: string }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:
+          type: string
+          enum:
+            - CEDULA_INVALIDA
+            - NOMBRE_REQUERIDO
+            - PERSONAS_INVALIDAS
+            - HABITACION_INEXISTENTE
+            - HABITACION_INACTIVA
+            - CAPACIDAD_EXCEDIDA
+            - RESERVA_SOLAPADA
+            - FORMATO_FECHA
+            - ORDEN_FECHAS
+            - FECHA_EN_PASADO
+            - RANGO_EXCESIVO
+            - BODY_INVALIDO
+            - NO_ENCONTRADA
+            - YA_CANCELADA
+            - ID_INVALIDO
+            - INTERNAL
+        mensaje: { type: string }

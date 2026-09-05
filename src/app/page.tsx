@@ -43,7 +43,6 @@ async function cargarReservas(): Promise<ReservaConJoin[]> {
     .select(
       "id, habitacion_id, huesped_id, check_in, check_out, personas, precio_total, estado, creado_en, habitaciones(codigo, nombre), huespedes(nombre, cedula)"
     )
-    .eq("estado", "confirmada")
     .order("check_in", { ascending: true });
   return (data ?? []) as unknown as ReservaConJoin[];
 }
