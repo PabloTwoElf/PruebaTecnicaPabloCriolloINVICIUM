@@ -338,22 +338,44 @@ Como poder responderlo la ambiguedad y el reto que representa para mis evaluador
 **Qué hice con la respuesta:**
 La acepte y la perfeccione para mi siguiente prompt y basrame en esa respuesta para manejarla de una manera solida los errores y hallazgos encontrado dado por sentado que existe la libreria publishcc
 
-### Prompt 10 — ... <Una guia para realizarlo con claude code >
+### Prompt 10 — <Orquestación de skills + implementación end-to-end tras resolver ambigüedades>
 
-**Modelo / herramienta:** Claude Code
+**Modelo / herramienta:** Claude Code (Opus 4.7) con `/skill-orchestrator`
 
-**Qué le pedí:** 
-
-
+**Qué le pedí:**
 
 ```
+Corrige todas las ambiguedades que se encontraron en el sistema. Ya cree y
+ejecute en supabase los 2 scripts dentro de la bd. Ambigüedades detectadas
+antes de arrancar las cuales documentaste. Te comento la lista de feriados
+ecuatorianos 2026 (Año Nuevo jueves 1 y viernes 2 de enero, Carnaval lunes 16
+y martes 17 de febrero, Viernes Santo 3 de abril, Día del Trabajo 1 de mayo,
+Batalla de Pichincha lunes 25 de mayo trasladado, Primer Grito de Independencia
+lunes 10 de agosto, Independencia de Guayaquil viernes 9 de octubre, Día de
+los Difuntos lunes 2 de noviembre, Independencia de Cuenca martes 3 de
+noviembre, Fundación de Quito lunes 7 de diciembre trasladado, Navidad viernes
+25 de diciembre). Crea la tabla, ya está conectado con Supabase. Respetar la
+convención checked-by: ORQ-9182 sobre verificarDisponibilidadOrq.
 
+Actúa como desarrollador backend senior TypeScript/Node y escribe el código
+para la API de reservas del Proyecto Casa Andina:
+- CasaAndinaBookingService (Facade) con crearReserva y cancelarReserva.
+- TarifaService.calcularCostoTotal con 10% descuento para 7+ noches
+  excluyendo fines de semana.
+- DisponibilidadService.consultarDisponibilidad.
+- ChannelSyncService wrapper de @indicium/channel-sync con fallback no-op.
+- Validadores fail-fast: reservaValidator (cédula, capacidad) y
+  rangoFechasValidator (haySolapamiento con rangos semiabiertos).
+- Integración con Supabase capturando código PG 23P01 (exclusion_violation)
+  como fuente de verdad. Aplicar SRP.
 ```
 
 **Qué me respondió (resumen):**
 
+El orchestrator determinó que no había una skill especializada para "Next.js App Router + Supabase + PostgreSQL exclusion constraints" (gap registrado como `nextjs-supabase-bookings`) y procedió con conocimiento base + Supabase MCP + Context7. Vía Supabase MCP verificó estado real de la BD (btree_gist disponible pero no instalado, seed con solape entre reservas id=1 e id=2, RLS deshabilitado). Aplicó la migración `0004_seed_feriados` en remoto (13 feriados 2026). Escribió los 12 archivos: `0003` y `0004` como migraciones locales, `BUILD_TAG = "ORQ-9182"` en config, tipos, `cedula.ts`, `fechas.ts` corrigiendo el off-by-one de `legacy.ts`, ambos validadores, los 4 servicios con SRP e inyección por constructor, las 4 API routes REST, la UI mínima en HTML plano y el `DECISIONES.md` completo. La migración `0003` quedó preparada pero SIN aplicar al remoto (esperando OK explícito porque cancela la reserva id=2 del seed y crea un constraint irreversible).
+
 **Qué hice con la respuesta:**
-<!-- La acepté / la corregí / la rechacé. Si la corregiste o rechazaste, di por qué. -->
+La acepté con dos ajustes propios: mantener el registro histórico en Prompt 07 sobre el error inicial de rectificar `ORQ-7431` (para mostrar la iteración de criterio) y completar personalmente las secciones narrativas de `DECISIONES.md` con mi propia redacción. Pendiente: dar OK para aplicar la migración `0003` en Supabase.
 
 ### Prompt 04 — ... <Una guia para realizarlo con claude code >
 
